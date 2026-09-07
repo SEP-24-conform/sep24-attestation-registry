@@ -12,6 +12,27 @@ Part of a three-repo project:
 - **This repo** — the on-chain record.
 - [`sep24-conformance-backend`](https://github.com/SEP-24-conform/sep24-conformance-backend) — the API service that runs the checker and writes to this contract.
 
+```mermaid
+flowchart LR
+    Anchor[(Anchor under test)]
+    Lib[sep24-conformance<br/>library + CLI]
+    BE[sep24-conformance-backend]
+    subgraph This repo
+        Contract[sep24-attestation-registry<br/>Soroban contract]
+    end
+    FE[sep24-conformance-frontend]
+
+    Lib -->|GET stellar.toml, GET /info| Anchor
+    BE -->|runs| Lib
+    BE -->|attest domain, passed, hash<br/>admin-signed| Contract
+    Contract -->|get_attestation domain<br/>no auth required| BE
+    FE -->|POST /api/checks, GET /api/registry/:domain/onchain| BE
+```
+
+This repo depends on nothing else in the project — it's pure Soroban
+contract code with no knowledge of the checker or the backend beyond the
+shape of the data it's handed.
+
 ## Table of contents
 
 - [Why this exists](#why-this-exists)
